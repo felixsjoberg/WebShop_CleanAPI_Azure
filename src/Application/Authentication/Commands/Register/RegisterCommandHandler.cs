@@ -1,43 +1,35 @@
-// using Application.Authentication.Common;
-// using Application.Common.Interfaces.Authentication;
-// using Domain.Entities;
-// using MediatR;
-// using BankApplication.Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Authentication;
+using Application.Common.Interfaces.Persistence;
+using MediatR;
 
-// namespace CA.Application.Authentication.Commands.Register;
+namespace Application.Authentication.Commands.Register;
 
-// public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthenticationResponse>
-// {
-//     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
+{
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-//     private readonly IUserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
 
-//     public RegisterCommandHandler(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator)
-//     {
+    public RegisterCommandHandler(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator)
+    {
 
-//         _jwtTokenGenerator = jwtTokenGenerator;
-//         _userRepository = userRepository;
+        _jwtTokenGenerator = jwtTokenGenerator;
+        _userRepository = userRepository;
 
-//     }
+    }
 
-//     public async Task<AuthenticationResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
-//     {
-//         var user = new User
-//         {
-//             Email = request.Email,
-//             Password = request.Password
-//         };
-//         if (await _userQueryRepository.GetByEmail(user.Email) is not null)
-//         {
-//             throw new Exception("User already exists");
-//         }
+    public async Task<RegisterResponse> Handle(RegisterCommand command, CancellationToken cancellationToken)
+    {
 
-//         var newUser = await _userCommandRepository.AddAsync(user);
+        if (await _userRepository.ValidateCredientals(command.Username, command.Password))
+        {
+            throw new Exception("Invalid combination of username and password");
+        }
 
-//         var token = _jwtTokenGenerator.GenerateToken(user);
+        var jwttoken = _jwtTokenGenerator.GenerateToken(command.Username);
 
-//         return new AuthenticationResponse
-//         (newUser.UserId,
-//         token);
-//     }
-// }
+        var result = await _userRepository.Register(command.Email, command.Username, command.Password);
+
+        return new RegisterResponse(jwttoken.Token, jwttoken.Expiration);
+    }
+}

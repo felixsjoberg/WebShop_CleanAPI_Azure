@@ -1,7 +1,6 @@
-﻿using System;
-using BankApplication.Application.Common.Interfaces.Services;
+﻿using Application.Common.Interfaces.Services;
 
-namespace BankApplication.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 public class DateTimeProvider : IDateTimeProvider
 {

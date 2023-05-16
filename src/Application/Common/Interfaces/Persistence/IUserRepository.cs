@@ -1,8 +1,6 @@
-﻿using Domain.Entities;
-
-namespace BankApplication.Application.Common.Interfaces.Persistence;
-
+﻿namespace Application.Common.Interfaces.Persistence;
 public interface IUserRepository
 {
-    Task<User> GetByIdAsync(Guid id);
+    Task<bool> ValidateCredientals(string username, string password);
+    Task<bool> Register(string email, string username, string password);
 }

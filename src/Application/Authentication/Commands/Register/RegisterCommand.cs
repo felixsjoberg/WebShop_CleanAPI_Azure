@@ -1,6 +1,8 @@
-using Application.Authentication.Common;
 using MediatR;
-namespace CA.Application.Authentication.Commands.Register;
+
+namespace Application.Authentication.Commands.Register;
+
 public record RegisterCommand(
+    string Username,
     string Email,
-    string Password): IRequest<AuthenticationResponse>;
+    string Password): IRequest<RegisterResponse>;

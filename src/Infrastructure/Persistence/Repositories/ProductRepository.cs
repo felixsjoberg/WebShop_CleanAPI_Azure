@@ -12,7 +12,7 @@ public class ProductRepository : IProductRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Product> GetProductAsync(Guid id)
+    public async Task<Product?> GetProductAsync(Guid id)
     {
         var result = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
         return result;

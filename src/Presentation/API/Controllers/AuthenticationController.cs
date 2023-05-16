@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using CA.Application.Authentication.Commands.Register;
-using CA.Application.Authentication.Queries.Login;
+using Application.Authentication.Commands.Register;
+using Application.Authentication.Queries.Login;
 
-namespace CA.WebUI.Controllers;
+namespace Presentation.API.Controllers;
 
 [Route("auth")]
 [ApiController]

@@ -23,7 +23,7 @@ public class GetProductQueryHandler :
 
         if (product is null)
         {
-            throw new Exception("User does not exist");
+            throw new Exception("Product does not exist");
         }
 
         return new GetProductResponse(product

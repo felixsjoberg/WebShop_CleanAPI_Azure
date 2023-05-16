@@ -1,42 +1,37 @@
-// using Application.Authentication.Common;
-// using Application.Common.Interfaces.Authentication;
-// using BankApplication.Application.Common.Interfaces.Persistence;
-// using MediatR;
+using Application.Authentication.Common;
+using Application.Common.Errors;
+using Application.Common.Interfaces.Authentication;
+using Application.Common.Interfaces.Persistence;
+using MediatR;
 
-// namespace CA.Application.Authentication.Queries.Login;
+namespace Application.Authentication.Queries.Login;
 
-// public class LoginQueryHandler :
-//     IRequestHandler<LoginQuery, AuthenticationResponse>
-// {
-//     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+public class LoginQueryHandler :
+    IRequestHandler<LoginQuery, LoginResponse>
+{
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-//     private readonly IUserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
 
 
-//     public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository )
-//     {
-//         _jwtTokenGenerator = jwtTokenGenerator;
-//         _userRepository = userRepository;
-//     }
+    public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository )
+    {
+        _jwtTokenGenerator = jwtTokenGenerator;
+        _userRepository = userRepository;
+    }
 
-//     public async Task<AuthenticationResponse> Handle(LoginQuery query, CancellationToken cancellationToken)
-//     {
-//         var user = await _userRepository.GetByEmail(query.Email);
+    public async Task<LoginResponse> Handle(LoginQuery query, CancellationToken cancellationToken)
+    {
+        var validUser = await _userRepository.ValidateCredientals(query.Username, query.Password);
+        
+        if (!validUser)
+        {
+            throw new InvalidLoginCombination();
+        }
+        
+        var token = _jwtTokenGenerator.GenerateToken(query.Username);
 
-//         if (user is null)
-//         {
-//             throw new Exception("User does not exist");
-//         }
-
-//         if (user.Password != query.Password)
-//         {
-//             throw new Exception("Invalid password");
-//         }
-
-//         var token = _jwtTokenGenerator.GenerateToken(user);
-
-//         return new AuthenticationResponse(
-//             user.UserId,
-//             token);
-//     }
-// }
+        return new LoginResponse(
+            token.Token, token.Expiration);
+    }
+}
