@@ -1,3 +1,4 @@
+using System.Reflection;
 using Domain.Entities;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -12,4 +13,10 @@ public class TopStyleDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<Product> Products { get; set; } = null!;
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        base.OnModelCreating(builder);
+    }
 }
