@@ -19,9 +19,13 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public JwtToken GenerateToken(string UserName)
     {
+        if (_jwtSettings.SecretKey == null)
+        {
+            throw new EmptySecretKeyException();
+        }
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+                Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
             SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
@@ -35,10 +39,10 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes == 0 ? 60 : _jwtSettings.ExpiryMinutes),
             
             signingCredentials: signingCredentials);
 
-        return new JwtToken{Token = new JwtSecurityTokenHandler().WriteToken(securityToken), Expiration= securityToken.ValidTo};
+        return new JwtToken{Token = new JwtSecurityTokenHandler().WriteToken(securityToken), Expiration= securityToken.ValidTo.ToLocalTime()};
     }
 }

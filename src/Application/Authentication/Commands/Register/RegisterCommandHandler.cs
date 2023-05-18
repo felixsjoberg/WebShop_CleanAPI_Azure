@@ -1,3 +1,4 @@
+using Application.Common.Errors;
 using Application.Common.Interfaces.Authentication;
 using Application.Common.Interfaces.Persistence;
 using MediatR;
@@ -23,7 +24,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 
         if (await _userRepository.ValidateCredientals(command.Username, command.Password))
         {
-            throw new Exception("Invalid combination of username and password");
+            throw new InvalidLoginCombination();
         }
 
         var jwttoken = _jwtTokenGenerator.GenerateToken(command.Username);

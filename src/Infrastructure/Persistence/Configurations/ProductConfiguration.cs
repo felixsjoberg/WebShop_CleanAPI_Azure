@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,7 +14,8 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasKey(p => p.Id);
 
             builder.Property(p => p.Id)
-                .ValueGeneratedNever();
+                 .HasConversion(v => v.Value, v => new ProductId(v))
+                 .IsRequired();
 
             builder.Property(p => p.Name)
                 .HasMaxLength(50)

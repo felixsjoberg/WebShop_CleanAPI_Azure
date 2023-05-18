@@ -2,12 +2,12 @@ namespace Domain.ValueObjects
 {
     public class OrderId
     {
-        public OrderId(Guid value)
+        public OrderId(Guid? value)
         {
             Value = value;
         }
 
-        public Guid Value { get; }
+        public Guid? Value { get; }
 
         public override bool Equals(object? obj)
         {

@@ -4,9 +4,9 @@ using Domain.ValueObjects;
 namespace Domain.Entities;
 public class Order
 {
-    public Order(OrderId id, string userId, OrderStatus status)
+    public Order(string userId, OrderStatus status)
     {
-        Id = id;
+        Id = new OrderId(Guid.NewGuid());
         UserId = userId;
         Status = status;
         OrderDate = DateTime.UtcNow;

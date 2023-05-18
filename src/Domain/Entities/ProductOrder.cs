@@ -1,8 +1,10 @@
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 public class ProductOrder
 {
-    public int ProductId { get; set; }
+    public ProductId ProductId { get; set; }
     public Product Product { get; set; } = null!;
-    public int OrderId { get; set; }
+    public OrderId OrderId { get; set; }
     public Order? Order { get; set; }
 }

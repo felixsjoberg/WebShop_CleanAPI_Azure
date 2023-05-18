@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,11 +14,13 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasKey(o => o.Id);
 
             builder.Property(o => o.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(id => id.Value, value => new OrderId(value));
+
 
             builder.Property(o => o.UserId)
-                .HasMaxLength(50)
-                .HasColumnType("varchar(50)")
+                .HasMaxLength(450)
+                .HasColumnType("nvarchar(450)")
                 .IsRequired();
 
             builder.Property(o => o.Status)
@@ -29,6 +32,10 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasMany(o => o.ProductOrders)
                 .WithOne(po => po.Order)
                 .HasForeignKey(po => po.OrderId);
+
+            builder.HasOne<ApplicationUser>()
+                .WithMany(user => user.Orders)
+                .HasForeignKey(o => o.UserId);
         }
     }
 }

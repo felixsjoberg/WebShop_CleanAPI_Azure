@@ -43,12 +43,16 @@ public class UserRepository : IUserRepository
         if (!await _roleManager.RoleExistsAsync(UserRoles.User))
             await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
 
+        var result = await _userManager.CreateAsync(user, password);
+        if (!result.Succeeded)
+        {
+            throw new PasswordValidationException();
+        }
+
         if (await _roleManager.RoleExistsAsync(UserRoles.User))
         {
             await _userManager.AddToRoleAsync(user, UserRoles.User);
         }
-
-        var result = await _userManager.CreateAsync(user, password);
 
         return result.Succeeded;
     }

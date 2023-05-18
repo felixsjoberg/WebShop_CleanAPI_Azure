@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.Persistence;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Infrastructure.Persistence.DataContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ public class ProductRepository : IProductRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Product?> GetProductAsync(Guid id)
+    public async Task<Product?> GetProductAsync(ProductId id)
     {
         var result = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
         return result;

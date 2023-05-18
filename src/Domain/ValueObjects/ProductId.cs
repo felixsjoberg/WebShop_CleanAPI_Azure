@@ -2,12 +2,12 @@ namespace Domain.ValueObjects
 {
     public class ProductId
     {
-        public ProductId(Guid value)
+        public ProductId(int value)
         {
             Value = value;
         }
 
-        public Guid Value { get; }
+        public int Value { get; }
 
         public override bool Equals(object? obj)
         {
