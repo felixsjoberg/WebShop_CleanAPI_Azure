@@ -1,5 +1,6 @@
-﻿
-
+﻿using System.Reflection;
+using MapsterMapper;
+using Mapster;
 using Microsoft.OpenApi.Models;
 
 namespace Presentation.API;
@@ -8,9 +9,25 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
+        services
+            .AddSwagger()
+            .AddMappings();
+
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        return services;
+    }
+    public static IServiceCollection AddMappings(this IServiceCollection services)
+    {
+        var config = TypeAdapterConfig.GlobalSettings;
+        config.Scan(Assembly.GetExecutingAssembly());
 
+        services.AddSingleton(config);
+        services.AddScoped<IMapper, ServiceMapper>();
+        return services;
+    }
+    public static IServiceCollection AddSwagger(this IServiceCollection services)
+    {
         services.AddSwaggerGen();
         services.AddSwaggerGen(options =>
         {
@@ -22,8 +39,6 @@ public static class DependencyInjection
                 Type = SecuritySchemeType.ApiKey
             });
         });
-
         return services;
     }
 }
-

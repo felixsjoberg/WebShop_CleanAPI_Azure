@@ -1,3 +1,4 @@
+using Application.Authentication.Common;
 using Application.Common.Errors;
 using Application.Common.Interfaces.Authentication;
 using Application.Common.Interfaces.Persistence;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace Application.Authentication.Commands.Register;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthenticationResult>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
@@ -19,18 +20,22 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 
     }
 
-    public async Task<RegisterResponse> Handle(RegisterCommand command, CancellationToken cancellationToken)
+    public async Task<AuthenticationResult> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
 
-        if (await _userRepository.ValidateCredientals(command.Username, command.Password))
+        if (await _userRepository.ValidateUsername(command.Username))
         {
-            throw new InvalidLoginCombination();
+            throw new UserExistsException();
+        }
+        if (await _userRepository.ValidateEmail(command.Email))
+        {
+            throw new EmailExistsException();
         }
 
         var jwttoken = _jwtTokenGenerator.GenerateToken(command.Username);
 
         var result = await _userRepository.Register(command.Email, command.Username, command.Password);
 
-        return new RegisterResponse(jwttoken.Token, jwttoken.Expiration);
+        return new AuthenticationResult(jwttoken.Token, jwttoken.Expiration);
     }
 }

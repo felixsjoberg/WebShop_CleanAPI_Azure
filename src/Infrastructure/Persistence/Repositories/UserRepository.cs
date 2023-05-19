@@ -1,3 +1,4 @@
+using Application.Common.Errors;
 using Application.Common.Interfaces.Persistence;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,16 @@ public class UserRepository : IUserRepository
         _userManager = userManager;
         _signInManager = signInManager;
         _roleManager = roleManager;
+    }
+    public async Task<bool> ValidateUsername(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        return user is not null;
+    }
+    public async Task<bool> ValidateEmail(string email)
+    {
+        var Email = await _userManager.FindByEmailAsync(email);
+        return Email is not null;
     }
     public async Task<bool> ValidateCredientals(string username, string password)
     {

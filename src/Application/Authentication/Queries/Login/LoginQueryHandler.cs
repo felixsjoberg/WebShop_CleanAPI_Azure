@@ -7,7 +7,7 @@ using MediatR;
 namespace Application.Authentication.Queries.Login;
 
 public class LoginQueryHandler :
-    IRequestHandler<LoginQuery, LoginResponse>
+    IRequestHandler<LoginQuery, AuthenticationResult>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
@@ -20,7 +20,7 @@ public class LoginQueryHandler :
         _userRepository = userRepository;
     }
 
-    public async Task<LoginResponse> Handle(LoginQuery query, CancellationToken cancellationToken)
+    public async Task<AuthenticationResult> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
         var validUser = await _userRepository.ValidateCredientals(query.Username, query.Password);
         
@@ -31,7 +31,7 @@ public class LoginQueryHandler :
         
         var token = _jwtTokenGenerator.GenerateToken(query.Username);
 
-        return new LoginResponse(
+        return new AuthenticationResult(
             token.Token, token.Expiration);
     }
 }

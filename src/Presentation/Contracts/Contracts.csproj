@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="1.0.0" />
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
