@@ -1,17 +1,19 @@
-
 // using Application.Common.Interfaces.Persistence;
+// using MediatR;
 
-// public class SearchProductsCommandHandler : IRequestHandler<AddAccountCreditCommand, AddAccountCreditResult>
+// namespace Application.Products.Queries.SearchProducts;
+
+// public class SearchProductsQueryHandler : IRequestHandler<SearchProductsQuery, SearchProductsResult>
 // {
 //     private readonly IProductRepository _productRepository;
 
-//     public SearchProductsCommandHandler(IProductRepository productRepository)
+//     public SearchProductsQueryHandler(IProductRepository productRepository)
 //     {
 
 //         _productRepository = productRepository;
 //     }
 
-//     public async Task<SearchProducts> Handle(SearchProductCommand request, CancellationToken cancellationToken)
+//     public async Task<SearchProductsResult> Handle(SearchProductsQuery request, CancellationToken cancellationToken)
 //     {
 //         var query = _productRepository.AsQueryable();
 

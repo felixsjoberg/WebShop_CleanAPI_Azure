@@ -2,4 +2,4 @@
 
 namespace Application.Products.Response.Queries;
 
-public record GetProductResponse(Product Product);
+public record GetAllProductsResult(IEnumerable<Product> Products);

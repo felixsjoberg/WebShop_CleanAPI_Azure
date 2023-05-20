@@ -1,12 +1,12 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Products.Queries;
-using Application.Products.Response.Queries;
+using Application.Products.Queries.GetProduct;
 using MediatR;
 
 namespace Application.Authentication.Queries.Login;
 
 public class GetProductQueryHandler :
-    IRequestHandler<GetProductQuery, GetProductResponse>
+    IRequestHandler<GetProductQuery, GetProductResult>
 {
 
     private readonly IProductRepository _productRepository;
@@ -17,16 +17,15 @@ public class GetProductQueryHandler :
             _productRepository = productRepository;
     }
 
-    public async Task<GetProductResponse> Handle(GetProductQuery query, CancellationToken cancellationToken)
+    public async Task<GetProductResult> Handle(GetProductQuery query, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetProductAsync(query.Id);
+        var product = await _productRepository.GetAsync(query.Id);
 
         if (product is null)
         {
             throw new Exception("Product does not exist");
         }
 
-        return new GetProductResponse(product
-            );
+        return new GetProductResult(product);
     }
 }
