@@ -14,10 +14,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Authentic
 
     public RegisterCommandHandler(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator)
     {
-
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
-
     }
 
     public async Task<AuthenticationResult> Handle(RegisterCommand command, CancellationToken cancellationToken)
@@ -32,9 +30,9 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Authentic
             throw new EmailExistsException();
         }
 
-        var jwttoken = _jwtTokenGenerator.GenerateToken(command.Username);
-
         var result = await _userRepository.Register(command.Email, command.Username, command.Password);
+
+        var jwttoken = await _jwtTokenGenerator.GenerateTokenAsync(command.Username);
 
         return new AuthenticationResult(jwttoken.Token, jwttoken.Expiration);
     }

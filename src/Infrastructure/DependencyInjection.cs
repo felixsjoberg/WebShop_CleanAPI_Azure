@@ -41,10 +41,10 @@ public static class DependencyInjection
     public static IServiceCollection AddContext(
         this IServiceCollection services, ConfigurationManager configuration)
     {
-        
+
         var connection = configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-        
-        services.AddDbContext<TopStyleDbContext>(options => options.UseSqlServer(connection));
+        services.AddDbContext<TopStyleDbContext>(options => options.UseSqlServer(connection,
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
         var settings = new DataSettings();
         configuration.Bind(DataSettings.SectionName, settings);
@@ -60,11 +60,19 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<TopStyleDbContext>()
             .AddDefaultTokenProviders();
 
+        //JWT Bearer authentication scheme as the default scheme for authentication
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        });
+
         var JwtSettings = new JwtSettings();
         configuration.Bind(JwtSettings.SectionName, JwtSettings);
 
         services.AddSingleton(Options.Create(JwtSettings));
-        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
@@ -76,8 +84,8 @@ public static class DependencyInjection
                 ValidIssuer = JwtSettings.Issuer,
                 ValidAudience = JwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(JwtSettings.Secret))
+                    Encoding.UTF8.GetBytes(JwtSettings.SecretKey))
             });
-            return services;
+        return services;
     }
 }

@@ -1,5 +1,5 @@
 namespace Application.Common.Interfaces.Authentication;
 public interface IJwtTokenGenerator
 {
-    JwtToken GenerateToken(string UserName);
+    Task<JwtToken> GenerateTokenAsync(string UserName);
 }

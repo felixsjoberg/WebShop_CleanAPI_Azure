@@ -27,13 +27,10 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        // 1. map request with query
         var command = _mapper.Map<RegisterCommand>(request);
         
-        // 2. send query to mediator
         var result = await _mediator.Send(command);
 
-        // 3. map result with response
         var response = _mapper.Map<AuthenticationResponse>(result);
 
         return Ok(response);
@@ -43,13 +40,10 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        // 1. map request with query
         var query = _mapper.Map<LoginQuery>(request);
 
-        // 2. send query to mediator
         var result = await _mediator.Send(query);
 
-        // 3. map result with response
         var response = _mapper.Map<AuthenticationResponse>(result);
 
         return Ok(response);

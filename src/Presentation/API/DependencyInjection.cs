@@ -2,6 +2,8 @@
 using MapsterMapper;
 using Mapster;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using BankApplication.Api.Service;
 
 namespace Presentation.API;
 
@@ -11,10 +13,17 @@ public static class DependencyInjection
     {
         services
             .AddSwagger()
+            .AddJwtService()
             .AddMappings();
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        return services;
+    }
+    public static IServiceCollection AddJwtService(this IServiceCollection services)
+    {
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddTransient<JwtService>();
         return services;
     }
     public static IServiceCollection AddMappings(this IServiceCollection services)
@@ -38,7 +47,9 @@ public static class DependencyInjection
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey
             });
+            options.OperationFilter<SecurityRequirementsOperationFilter>();
         });
+
         return services;
     }
 }

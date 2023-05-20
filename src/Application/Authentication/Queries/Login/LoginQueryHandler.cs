@@ -23,13 +23,13 @@ public class LoginQueryHandler :
     public async Task<AuthenticationResult> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
         var validUser = await _userRepository.ValidateCredientals(query.Username, query.Password);
-        
+
         if (!validUser)
         {
             throw new InvalidLoginCombination();
         }
-        
-        var token = _jwtTokenGenerator.GenerateToken(query.Username);
+
+        var token = await _jwtTokenGenerator.GenerateTokenAsync(query.Username);
 
         return new AuthenticationResult(
             token.Token, token.Expiration);

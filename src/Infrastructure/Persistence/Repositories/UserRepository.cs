@@ -46,6 +46,7 @@ public class UserRepository : IUserRepository
         var user = new ApplicationUser
         {
             Email = email,
+            SecurityStamp = Guid.NewGuid().ToString(),
             UserName = username
         };
 
@@ -85,8 +86,3 @@ public class UserRepository : IUserRepository
         return result.Succeeded;
     }
 }
-// public async Task Login(UserLogin user)
-// {
-//     ValidateCredientals(user.UserName, user.Password);
-//     var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, false, false);
-// }
