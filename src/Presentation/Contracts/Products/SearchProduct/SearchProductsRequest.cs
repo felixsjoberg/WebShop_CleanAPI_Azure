@@ -1,2 +1,2 @@
 namespace Presentation.Contracts.Products.SearchProduct;
-public record SearchProductsRequest(decimal? Price, int? CategoryId);
+public record SearchProductsRequest(string SearchTerm,decimal? MinPrice, decimal? MaxPrice, int? CategoryId);

@@ -19,7 +19,7 @@ public class GetProductQueryHandler :
 
     public async Task<GetProductResult> Handle(GetProductQuery query, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetAsync(query.Id);
+        var product = await _productRepository.GetByIdAsync(query.Id);
 
         if (product is null)
         {

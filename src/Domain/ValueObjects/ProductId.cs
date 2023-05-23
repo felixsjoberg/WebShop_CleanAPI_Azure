@@ -7,7 +7,7 @@ namespace Domain.ValueObjects
             Value = value;
         }
 
-        public int Value { get; }
+        public int Value { get; private set; }
 
         public override bool Equals(object? obj)
         {

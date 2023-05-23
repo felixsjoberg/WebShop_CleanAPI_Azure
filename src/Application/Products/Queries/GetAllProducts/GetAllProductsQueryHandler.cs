@@ -4,11 +4,11 @@ using MediatR;
 
 namespace Application.Products.Queries.GetAllProducts
 {
-    public class GetAllProductsHandler : IRequestHandler<GetAllProductsQuery, GetAllProductsResult>
+    public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, GetAllProductsResult>
     {
         private readonly IProductRepository _productRepository;
 
-        public GetAllProductsHandler(IProductRepository productRepository)
+        public GetAllProductsQueryHandler(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }

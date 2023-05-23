@@ -1,46 +1,94 @@
+using Application.Products.Commands.CreateProduct;
+using Application.Products.Commands.DeactivateProduct;
+using Application.Products.Commands.DeleteProduct;
+using Application.Products.Commands.UpdateProduct;
+using Application.Products.Common.DTOs;
+using Application.Products.Queries.SearchProducts;
+using Application.Products.Response.Queries;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Contracts.Products.CreateProduct;
+using Presentation.Contracts.Products.SearchProduct;
+using Presentation.Contracts.Products.UpdateProduct;
 
 namespace Presentation.API.Controllers
 {
     [ApiController]
-    [Route("api/product")]
-    public class ProductController : ControllerBase
+    [Route("api/[Controller]")]
+    public class ProductsController : ControllerBase
     {
         private readonly ISender _mediator;
         private readonly IMapper _mapper;
 
 
-        public ProductController(IMapper mapper, ISender mediator)
+        public ProductsController(IMapper mapper, ISender mediator)
         {
             _mapper = mapper;
             _mediator = mediator;
         }
         [HttpGet]
-        public IActionResult Get()
+        [Authorize]
+        public async Task<IActionResult> GetAll()
         {
-            throw new NotImplementedException();
+            var query = new GetAllProductsQuery();
+            var result = await _mediator.Send(query);
+            var response = _mapper.Map<ProductDtoList>(result);
+            return Ok(response);
         }
-        // [HttpGet]
-        // [Route("api/product/search")]
-        // public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(string searchTerm, string category, decimal? minPrice, decimal? maxPrice)
-        // {
-        //     // 1. Map request to command
-        //     var command = new SearchProductsCommand
-        //     {
-        //         SearchTerm = searchTerm,
-        //         Category = category,
-        //         MinPrice = minPrice,
-        //         MaxPrice = maxPrice
-        //     };
-        //     // 2. Send command to mediator
-        //     var authResult = await _mediator.Send(command);
-        //     // 3. Map result to response
-        //     var results = _mapper.Map<IEnumerable<Product>>(authResult);
-        //     // move logic to service layer.
-        //     return Ok(results);
-        // }
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchProducts([FromQuery] SearchProductsRequest request)
+        {
+            var query = _mapper.Map<SearchProductsQuery>(request);
 
+            var result = await _mediator.Send(query);
+
+            var response = _mapper.Map<ProductDtoList>(result);
+
+            return Ok(response);
+        }
+        [HttpPost]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> CreateProduct(CreateProductRequest request)
+        {
+            var command = _mapper.Map<CreateProductCommand>(request);
+
+            var result = await _mediator.Send(command);
+
+            var response = _mapper.Map<ProductDto>(result);
+            return Ok(response);
+        }
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProduct(UpdateProductRequest request)
+        {
+            var command = _mapper.Map<UpdateProductCommand>(request);
+
+            var result = await _mediator.Send(command);
+
+            return Ok();
+        }
+        [HttpPatch("{id}/deactivate")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeactivateProduct(int id)
+        {
+            var command = new DeactivateProductCommand(id);
+
+            await _mediator.Send(command);
+
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var command = new DeleteProductCommand(id);
+
+            await _mediator.Send(command);
+
+            return NoContent();
+        }
     }
 }

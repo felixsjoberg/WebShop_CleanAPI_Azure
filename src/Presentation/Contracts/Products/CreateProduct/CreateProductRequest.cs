@@ -8,4 +8,5 @@ string Description,
 decimal Price,
 string ImageUrl,
 int CategoryId,
+[Range(0.01, 500000, ErrorMessage = "Stock must be greater than 0")]
 int Stock = 1);

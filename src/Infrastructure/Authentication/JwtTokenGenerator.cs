@@ -33,12 +33,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         //Register user roles in claims
         var user = await _userManager.FindByNameAsync(UserName);
-        var userRoles = await _userManager.GetRolesAsync(user);
+        var userRoles = await _userManager.GetRolesAsync(user!);
 
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, UserName),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user!.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
         foreach (var userRole in userRoles)

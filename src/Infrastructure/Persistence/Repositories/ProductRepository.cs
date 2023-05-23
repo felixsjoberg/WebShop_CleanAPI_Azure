@@ -1,8 +1,5 @@
 using Application.Common.Interfaces.Persistence;
 using Application.Products.Commands.CreateProduct;
-using Application.Products.Commands.DeactivateProduct;
-using Application.Products.Commands.DeleteProduct;
-using Application.Products.Commands.UpdateProduct;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Infrastructure.Persistence.DataContext;
@@ -16,51 +13,92 @@ public class ProductRepository : IProductRepository
     {
         _dbContext = dbContext;
     }
-    public Task<Product?> GetAsync(int id)
+    public async Task<Product?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var productId = new ProductId(id);
+        var result = await _dbContext.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id.Equals(productId));
+        return result;
+    }
+    public async Task<Product?> GetByIdWithTrackingAsync(Product product)
+    {
+        var result = await _dbContext.Products.FindAsync(product);
+        return result;
     }
 
-    public Task<CreateProductResult> AddAsync(Product product)
+    public async Task<Product?> GetByNameAsync(string name)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
+        return result;
+    }
+    public async Task<int> AddAsync(Product product)
+    {
+        await _dbContext.Products.AddAsync(product);
+        await _dbContext.SaveChangesAsync();
+        return product.Id.Value;
     }
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        var result = await _dbContext.Products.ToListAsync();
-        return result;
-    }
-    public async Task<Product?> GetProductAsync(ProductId id)
-    {
-        var result = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+        var result = await _dbContext.Products
+        .AsNoTracking()
+        .Select(x => new Product(
+            x.Id,
+            x.Name,
+            x.Description,
+            x.Price,
+            x.Stock,
+            x.CategoryId,
+            x.IsActive,
+            x.ImageUrl
+        ))
+        .ToListAsync();
+
         return result;
     }
 
-    public async Task<IEnumerable<Product>> SearchAsync()
+    public async Task<IEnumerable<Product>> SearchAsync(string searchTerm, int? categoryId, decimal? minPrice, decimal? maxPrice)
     {
-        throw new NotImplementedException();
+        var query = _dbContext.Products.AsNoTracking().AsQueryable();
+
+        query = query.Where(p => p.Name.Contains(searchTerm) || p.Description.Contains(searchTerm));
+        if (categoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == categoryId);
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice);
+        }
+
+        // Execute the query and return the results
+        var results = await query.ToListAsync();
+        return results;
     }
 
-    public async Task<DeleteProductResult> DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         var productId = new ProductId(id);
         var product = await _dbContext.Products.FindAsync(productId);
-        if (product == null)
-            return new DeleteProductResult(false);
 
         _dbContext.Products.Remove(product);
         await _dbContext.SaveChangesAsync();
-        return new DeleteProductResult(true);
-
     }
 
-    public Task<DeactivateProductResult> DeactivateAsync(Product product)
+    public async Task DeactivateAsync(Product product)
     {
-        throw new NotImplementedException();
+        _dbContext.Entry(product).Property(p => p.IsActive).IsModified = true;
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<UpdateProductResult> UpdateAsync(Product product)
+    public async Task UpdateAsync(Product updatedProduct)
     {
-        throw new NotImplementedException();
+        _dbContext.Entry(updatedProduct).State = EntityState.Modified;
+        _dbContext.Products.Update(updatedProduct);
+        await _dbContext.SaveChangesAsync();
     }
 }

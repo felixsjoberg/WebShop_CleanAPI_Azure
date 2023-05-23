@@ -1,3 +1,4 @@
+using Domain.Entities;
 using MediatR;
 
 namespace Application.Products.Commands.CreateProduct;
@@ -8,4 +9,4 @@ public record CreateProductCommand(
     decimal Price,
     int Stock,
     string ImageUrl,
-    int CategoryId) : IRequest<CreateProductResult>;
+    int CategoryId) : IRequest<Product>;

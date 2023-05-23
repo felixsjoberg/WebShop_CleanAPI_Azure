@@ -9,7 +9,6 @@ public record ProductDto
     decimal Price,
     int Stock,
     int CategoryId,
+    bool IsActive,
     string ImageUrl
 );
-
-public record ProductDtoList(IEnumerable<ProductDto> Products);

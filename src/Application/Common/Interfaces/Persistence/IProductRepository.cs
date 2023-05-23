@@ -9,10 +9,12 @@ namespace Application.Common.Interfaces.Persistence;
 public interface IProductRepository
 {
     Task<IEnumerable<Product>> GetAllAsync();
-    Task<Product?> GetAsync(int id);
-    Task<IEnumerable<Product>> SearchAsync();
-    Task<CreateProductResult> AddAsync(Product product);
-    Task<DeleteProductResult> DeleteAsync(int id);
-    Task<DeactivateProductResult> DeactivateAsync(Product product);
-    Task<UpdateProductResult> UpdateAsync(Product product);
+    Task<Product?> GetByIdAsync(int id);
+    Task<Product?> GetByIdWithTrackingAsync(Product product);
+    Task<Product?> GetByNameAsync(string name);
+    Task<IEnumerable<Product>> SearchAsync(string searchTerm, int? categoryId, decimal? minPrice, decimal? maxPrice);
+    Task<int> AddAsync(Product product);
+    Task DeleteAsync(int id);
+    Task DeactivateAsync(Product product);
+    Task UpdateAsync(Product product);
 }
