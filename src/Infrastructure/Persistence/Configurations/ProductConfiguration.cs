@@ -15,6 +15,7 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.Property(p => p.Id)
                  .HasConversion(v => v.Value, v => new ProductId(v))
+                 .ValueGeneratedOnAdd()
                  .IsRequired();
 
             builder.Property(p => p.Name)

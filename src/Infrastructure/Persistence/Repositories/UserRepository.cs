@@ -40,7 +40,10 @@ public class UserRepository : IUserRepository
     {
         return await _userManager.FindByEmailAsync(email);
     }
-
+    public async Task<ApplicationUser?> GetById(string id)
+    {
+        return await _userManager.FindByIdAsync(id);
+    }
     public async Task<bool> Register(string email, string username, string password)
     {
         var user = new ApplicationUser

@@ -4,17 +4,26 @@ using Domain.ValueObjects;
 namespace Domain.Entities;
 public class Order
 {
-    public Order(string userId, OrderStatus status)
+    public Order()
+    {
+    }
+    public Order(int customerId)
     {
         Id = new OrderId(Guid.NewGuid());
-        UserId = userId;
-        Status = status;
+        CustomerId = customerId;
         OrderDate = DateTime.UtcNow;
+    }
+    public Order(OrderId id, int customerId, OrderStatus status)
+    {
+        Id = id;
+        CustomerId = customerId;
+        Status = status;
     }
 
     public OrderId Id { get; }
-    public string UserId { get; }
-    public OrderStatus Status { get; }
+    public OrderStatus Status { get; private set; } = OrderStatus.Pending;
     public DateTime OrderDate { get; }
+    public int CustomerId { get; private set; }
+    public Customer Customer { get; set; } = null!;
     public ICollection<ProductOrder> ProductOrders { get; init; } = new List<ProductOrder>();
 }

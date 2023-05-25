@@ -4,4 +4,5 @@ namespace Application.Common.Interfaces.Persistence;
 public interface IProductOrderRepository
 {
     Task CreateAsync(ProductOrder productOrder);
+    Task UpdateAsync(ProductOrder existingProductOrder);
 }

@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Authentication;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Services;
 using Infrastructure.Authentication;
-using Infrastructure.Identity;
 using Infrastructure.Persistence.DataContext;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;

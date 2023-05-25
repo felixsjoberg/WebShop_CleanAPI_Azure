@@ -26,6 +26,8 @@ public class ErrorsController : ControllerBase
             ProductNameExistException => (StatusCodes.Status400BadRequest, "Product name already exists."),
             OutOfCategoryRange => (StatusCodes.Status400BadRequest, "Category does not exist."),
             ProductOnOrdersException => (StatusCodes.Status400BadRequest, "Product is on orders or does not exist."),
+            ProductNotFoundException => (StatusCodes.Status400BadRequest, "Product does not exist."),
+            DuplicateProductsInOrderItems => (StatusCodes.Status400BadRequest, "Duplicate products in orderItems, add the quantity to the existing item instead"),
             UserAccountAlreadyGotCustomerException => (StatusCodes.Status400BadRequest, "User account already has a customer bound to it."),
             PasswordValidationException => (StatusCodes.Status400BadRequest, "Passwords must have at least one non alphanumeric character, contain at least one digit ('0'-'9') and have at least one uppercase ('A'-'Z')."),
             _ => (StatusCodes.Status500InternalServerError, "An error occurred.") // default response for unhandled exceptions

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Configurations
 {
-    public class OrderConfiguration : IEntityTypeConfiguration<Order>
+    public partial class OrderConfiguration : IEntityTypeConfiguration<Order>
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
@@ -17,12 +17,6 @@ namespace Infrastructure.Persistence.Configurations
                 .ValueGeneratedNever()
                 .HasConversion(id => id.Value, value => new OrderId(value));
 
-
-            builder.Property(o => o.UserId)
-                .HasMaxLength(450)
-                .HasColumnType("nvarchar(450)")
-                .IsRequired();
-
             builder.Property(o => o.Status)
                 .IsRequired();
 
@@ -33,9 +27,9 @@ namespace Infrastructure.Persistence.Configurations
                 .WithOne(po => po.Order)
                 .HasForeignKey(po => po.OrderId);
 
-            builder.HasOne<ApplicationUser>()
-                .WithMany(user => user.Orders)
-                .HasForeignKey(o => o.UserId);
+            builder.HasOne(p => p.Customer)
+                .WithMany(c => c.Orders)
+                .HasForeignKey(p => p.CustomerId);
         }
     }
 }

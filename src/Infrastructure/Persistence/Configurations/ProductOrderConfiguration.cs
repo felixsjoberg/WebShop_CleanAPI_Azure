@@ -13,6 +13,9 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.HasKey(po => new { po.ProductId, po.OrderId });
 
+            builder.Property(po => po.Quantity)
+                .IsRequired();
+
             builder.Property(po => po.ProductId)
                 .HasConversion(p => p.Value, value => new ProductId(value));
 
