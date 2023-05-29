@@ -1,4 +1,3 @@
-using Application.Authentication.Common;
 using MediatR;
 
 namespace Application.Authentication.Queries.Login;

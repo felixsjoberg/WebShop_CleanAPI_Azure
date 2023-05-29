@@ -28,10 +28,10 @@ public class AuthenticationController : ControllerBase
     public async Task<IActionResult> Register(RegisterRequest request)
     {
         var command = _mapper.Map<RegisterCommand>(request);
-        
+
         var result = await _mediator.Send(command);
 
-        var response = _mapper.Map<AuthenticationResponse>(result);
+        var response = _mapper.Map<RegisterResponse>(result);
 
         return Ok(response);
     }
@@ -44,7 +44,7 @@ public class AuthenticationController : ControllerBase
 
         var result = await _mediator.Send(query);
 
-        var response = _mapper.Map<AuthenticationResponse>(result);
+        var response = _mapper.Map<LoginResponse>(result);
 
         return Ok(response);
     }

@@ -1,4 +1,3 @@
-using Application.Authentication.Common;
 using Application.Common.Errors;
 using Application.Common.Interfaces.Authentication;
 using Application.Common.Interfaces.Persistence;

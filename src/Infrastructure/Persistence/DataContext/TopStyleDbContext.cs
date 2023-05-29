@@ -19,6 +19,7 @@ public class TopStyleDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Customer> Customers { get; set; }
     public DbSet<ProductOrder> ProductOrders { get; set; }
     public DbSet<Category> Category { get; set; }
+    public DbSet<Address> Addresses { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

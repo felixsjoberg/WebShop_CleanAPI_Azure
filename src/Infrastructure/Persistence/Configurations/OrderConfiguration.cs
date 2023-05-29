@@ -27,9 +27,14 @@ namespace Infrastructure.Persistence.Configurations
                 .WithOne(po => po.Order)
                 .HasForeignKey(po => po.OrderId);
 
-            builder.HasOne(p => p.Customer)
+            builder.HasOne(o => o.ShippingAddress)
+                .WithMany(a => a.Orders)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(o => o.Customer)
                 .WithMany(c => c.Orders)
-                .HasForeignKey(p => p.CustomerId);
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

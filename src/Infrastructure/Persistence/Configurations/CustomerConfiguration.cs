@@ -21,31 +21,6 @@ public partial class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnType("varchar(100)")
             .IsRequired();
 
-        builder.Property(c => c.Streetaddress)
-            .HasMaxLength(100)
-            .HasColumnType("varchar(100)")
-            .IsRequired();
-
-        builder.Property(c => c.City)
-            .HasMaxLength(100)
-            .HasColumnType("nvarchar(100)")
-            .IsRequired();
-
-        builder.Property(c => c.Zipcode)
-            .HasMaxLength(50)
-            .HasColumnType("varchar(50)")
-            .IsRequired();
-
-        builder.Property(c => c.Country)
-            .HasMaxLength(60)
-            .HasColumnType("nvarchar(60)")
-            .IsRequired();
-
-        builder.Property(c => c.CountryCode)
-            .HasMaxLength(50)
-            .HasColumnType("varchar(50)")
-            .IsRequired();
-
         builder.Property(c => c.UserId)
             .HasMaxLength(450)
             .HasColumnType("nvarchar(450)")
@@ -55,8 +30,11 @@ public partial class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .WithOne(c => c.Customer)
             .HasForeignKey<Customer>(o => o.UserId);
 
-        builder.HasMany(c => c.Orders)
-            .WithOne(o => o.Customer)
-            .HasForeignKey(o => o.CustomerId);
+        // One customer has one address
+        builder.HasOne(c => c.Address)
+            .WithOne(a => a.Customer)
+            .HasForeignKey<Customer>(c => c.AddressId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

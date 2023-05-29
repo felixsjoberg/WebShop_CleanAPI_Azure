@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Application.Common;
+using Application.Common.Errors;
 using Application.Common.Interfaces.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

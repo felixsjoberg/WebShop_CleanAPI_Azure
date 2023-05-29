@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
     {
         return await _userManager.FindByIdAsync(id);
     }
-    public async Task<bool> Register(string email, string username, string password)
+    public async Task<string> Register(string email, string username, string password)
     {
         var user = new ApplicationUser
         {
@@ -64,12 +64,12 @@ public class UserRepository : IUserRepository
             throw new PasswordValidationException();
         }
 
-        if (await _roleManager.RoleExistsAsync(UserRoles.User))
+        if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
         {
-            await _userManager.AddToRoleAsync(user, UserRoles.User);
+            await _userManager.AddToRoleAsync(user, UserRoles.Admin);
         }
 
-        return result.Succeeded;
+        return user.Id;
     }
     public async Task<bool> AdminRegister(string email, string username, string password)
     {
