@@ -2,16 +2,23 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Contracts.Authentication;
 
-public record RegisterRequest()
-{
+public record RegisterRequest(
     [Required(ErrorMessage = "UserName is required")]
-    public string Username { get; set; } = null!;
+    string Username,
 
     [EmailAddress]
     [Required(ErrorMessage = "Email is required")]
-    public string Email { get; set; } = null!;
+    string Email,
 
     [Required(ErrorMessage = "Password is required")]
-    public string Password { get; set; } = null!;
+    string Password,
 
-}
+    [Required]
+    RegisterCustomerRequest Customer
+);
+public record RegisterCustomerRequest(
+    string FullName,
+    string Streetaddress,
+    string City,
+    string Zipcode,
+    string Country);

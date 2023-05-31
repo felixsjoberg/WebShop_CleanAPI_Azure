@@ -1,2 +1,2 @@
 namespace Contracts.Authentication;
-public record AuthenticationResponse(string Token, DateTime Expiration);
+public record RegisterResponse(string Token, DateTime Expiration, int CustomerId, int AddressId);

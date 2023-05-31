@@ -14,6 +14,5 @@ public record CustomerResponse(
     string Streetaddress,
     string City,
     string Zipcode,
-    string Country,
-    string CountryCode
+    string Country
 );

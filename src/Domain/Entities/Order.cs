@@ -31,9 +31,9 @@ public class Order
     public OrderId Id { get; private set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public DateTime OrderDate { get; }
-    public int CustomerId { get; private set; }
+    public int CustomerId { get;  set; }
     public int ShippingAddressId { get; set; }
     public Address ShippingAddress { get; set; }
     public Customer Customer { get; set; } = null!;
-    public ICollection<ProductOrder> ProductOrders { get; init; } = new List<ProductOrder>();
+    public ICollection<ProductOrder> ProductOrders { get; set; } = new List<ProductOrder>();
 }

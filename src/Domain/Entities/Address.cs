@@ -12,6 +12,19 @@ public class Address
         Zipcode = zipcode;
         Country = country;
     }
+    public Address(
+        int id,
+        string streetaddress,
+        string city,
+        string zipcode,
+        string country)
+    {
+        Id = id;
+        Streetaddress = streetaddress;
+        City = city;
+        Zipcode = zipcode;
+        Country = country;
+    }
 
     public int Id { get; set; }
     public string Streetaddress { get; private set; } = null!;

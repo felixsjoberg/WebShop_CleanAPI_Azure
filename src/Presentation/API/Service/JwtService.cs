@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 
-namespace BankApplication.Api.Service;
+namespace Presentation.API.Service;
 
 public class JwtService
 {
@@ -18,7 +15,7 @@ public class JwtService
 
     public Guid ExtractJwt()
     {
-        string authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
+        string authorizationHeader = _httpContextAccessor.HttpContext!.Request.Headers["Authorization"]!;
         string jwt = authorizationHeader.Split(' ')[1];
         
 
@@ -27,7 +24,7 @@ public class JwtService
         JwtSecurityToken jwtToken = (JwtSecurityToken)token;
         IEnumerable<Claim> claims = jwtToken.Claims;
 
-        string subject = claims.First(c => c.Type.ToLower() == "sub").Value;
+        string subject = claims.First(c => string.Equals(c.Type, "sub", StringComparison.CurrentCultureIgnoreCase)).Value;
         
         return Guid.Parse(subject);
     }

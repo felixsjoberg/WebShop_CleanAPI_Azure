@@ -69,14 +69,14 @@ public class Product
     public Category Category { get; init; } = null!;
     public ICollection<ProductOrder> ProductOrders { get; init; } = new List<ProductOrder>();
 
-    public void Update(string name, string description, decimal price, int stock, string imageUrl, int categoryId)
+    public void Update(string name, string description, decimal price, int stock, int categoryId, string imageUrl)
     {
         Name = name;
         Description = description;
         Price = price;
         Stock = stock;
-        ImageUrl = imageUrl;
         CategoryId = categoryId;
+        ImageUrl = imageUrl;
     }
     public void DecreaseStock(int quantity)
     {
@@ -91,6 +91,15 @@ public class Product
         }
 
         Stock -= quantity;
+    }
+    public void IncreaseStock(int quantity)
+    {
+        if (quantity < 0)
+        {
+            throw new ArgumentException("Quantity must be a positive value.");
+        }
+
+        Stock += quantity;
     }
     public void SetProductId(int id)
     {

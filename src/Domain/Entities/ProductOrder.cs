@@ -27,4 +27,12 @@ public class ProductOrder
 
         return Product.Price * Quantity;
     }
+    public void UpdateQuantity(int quantity)
+    {
+        if (quantity < 0)
+        {
+            throw new ArgumentException("Quantity must be a positive value.");
+        }
+        Quantity = quantity;
+    }
 }
