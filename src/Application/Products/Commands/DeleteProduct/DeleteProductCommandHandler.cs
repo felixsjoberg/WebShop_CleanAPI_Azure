@@ -19,7 +19,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
         {
             throw new ProductOnOrdersException();
         }
-        await _productRepository.DeleteAsync(request.Id);
+        await _productRepository.DeleteAsync(product);
         return Unit.Value;
     }
 }

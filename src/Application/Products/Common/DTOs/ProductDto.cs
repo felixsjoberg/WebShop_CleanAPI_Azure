@@ -1,4 +1,3 @@
-using Domain.ValueObjects;
 namespace Application.Products.Common.DTOs;
 
 public record ProductDto

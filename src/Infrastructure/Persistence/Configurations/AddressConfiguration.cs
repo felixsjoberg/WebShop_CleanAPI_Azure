@@ -1,5 +1,4 @@
 using Domain.Entities;
-using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -36,12 +35,6 @@ namespace Infrastructure.Persistence.Configurations
                 .HasColumnType("nvarchar(60)")
                 .IsRequired();
 
-            // // One address is associated with one customer
-            // builder.HasOne(a => a.Customer)
-            //     .WithOne(c => c.Address)
-            //     .OnDelete(DeleteBehavior.Restrict);
-
-            // Map the relationship with Order
             builder.HasMany(a => a.Orders)
                 .WithOne(o => o.ShippingAddress)
                 .HasForeignKey(o => o.ShippingAddressId)

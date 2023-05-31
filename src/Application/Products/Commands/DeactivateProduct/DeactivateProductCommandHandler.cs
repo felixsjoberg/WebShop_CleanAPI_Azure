@@ -15,10 +15,10 @@ public class DeactivateProductCommandHandler : IRequestHandler<DeactivateProduct
 
     public async Task<Unit> Handle(DeactivateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(request.id);
-        if (product is null)
+        var product = await _productRepository.GetByIdAsync(request.id) ?? throw new NotFoundException();
+        if (!product.IsActive)
         {
-            throw new NotFoundException();
+            throw new ProductAlreadyDeactivated();
         }
         product.IsActive = false;
 

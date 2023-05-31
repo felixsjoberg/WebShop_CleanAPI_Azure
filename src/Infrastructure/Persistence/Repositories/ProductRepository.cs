@@ -1,5 +1,4 @@
 using Application.Common.Interfaces.Persistence;
-using Application.Products.Commands.CreateProduct;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Infrastructure.Persistence.DataContext;
@@ -16,12 +15,18 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetByIdAsync(int id)
     {
         var productId = new ProductId(id);
-        var result = await _dbContext.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id.Equals(productId));
+        var result = await _dbContext.Products
+                .Include(p => p.ProductOrders)
+                .FirstOrDefaultAsync(p => p.Id.Equals(productId));
         return result;
     }
-    public async Task<Product?> GetByIdWithTrackingAsync(Product product)
+    public async Task<Product?> GetByIdNoTrackingAsync(Product product)
     {
-        var result = await _dbContext.Products.FindAsync(product);
+        var productId = new ProductId(product.Id.Value);
+        var result = await _dbContext.Products
+                .AsNoTracking()
+                .Include(p => p.ProductOrders)
+                .FirstOrDefaultAsync(p => p.Id.Equals(productId));
         return result;
     }
 
@@ -80,11 +85,8 @@ public class ProductRepository : IProductRepository
         return results;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Product product)
     {
-        var productId = new ProductId(id);
-        var product = await _dbContext.Products.FindAsync(productId);
-
         _dbContext.Products.Remove(product);
         await _dbContext.SaveChangesAsync();
     }
@@ -97,7 +99,17 @@ public class ProductRepository : IProductRepository
 
     public async Task UpdateAsync(Product updatedProduct)
     {
-        _dbContext.Entry(updatedProduct).State = EntityState.Modified;
+        _dbContext.Products.Update(updatedProduct);
+        await _dbContext.SaveChangesAsync();
+    }
+    public async Task UpdateAsyncWithTrack(Product updatedProduct)
+    {
+        var existingProduct = await _dbContext.Products.FindAsync(updatedProduct.Id);
+        if (existingProduct != null)
+        {
+            _dbContext.Entry(existingProduct).State = EntityState.Detached;
+        }
+
         _dbContext.Products.Update(updatedProduct);
         await _dbContext.SaveChangesAsync();
     }

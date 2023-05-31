@@ -1,7 +1,6 @@
 using Application.Common.Errors;
 using Application.Common.Interfaces.Persistence;
 using Domain.Entities;
-using Domain.ValueObjects;
 using MediatR;
 
 namespace Application.Products.Commands.CreateProduct;
@@ -9,9 +8,11 @@ namespace Application.Products.Commands.CreateProduct;
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Product>
 {
     private readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CreateProductCommandHandler(IProductRepository productRepository)
+    public CreateProductCommandHandler(IProductRepository productRepository, ICategoryRepository categoryRepository)
     {
+        _categoryRepository = categoryRepository;
         _productRepository = productRepository;
     }
 
@@ -26,6 +27,11 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             request.CategoryId,
             request.ImageUrl
         );
+        var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
+        if (category is null)
+        {
+            throw new CategoryNotFoundException();
+        }
 
         var result = await _productRepository.GetByNameAsync(product.Name);
         if (result != null)

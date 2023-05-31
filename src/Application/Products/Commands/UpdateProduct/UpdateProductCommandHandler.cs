@@ -25,8 +25,7 @@ public class UpdateProdcutCommandHandler : IRequestHandler<UpdateProductCommand,
         {
             throw new OutOfCategoryRange();
         }
-        var modifiedProduct = new Product(
-            new ProductId(request.Id),
+        product.Update(
             request.Name,
             request.Description,
             request.Price,
@@ -34,7 +33,8 @@ public class UpdateProdcutCommandHandler : IRequestHandler<UpdateProductCommand,
             request.CategoryId,
             request.ImageUrl
         );
-        await _productRepository.UpdateAsync(modifiedProduct);
+
+        await _productRepository.UpdateAsync(product);
 
         return Unit.Value;
     }

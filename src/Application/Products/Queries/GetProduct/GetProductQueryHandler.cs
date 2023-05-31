@@ -8,9 +8,7 @@ namespace Application.Authentication.Queries.Login;
 public class GetProductQueryHandler :
     IRequestHandler<GetProductQuery, GetProductResult>
 {
-
     private readonly IProductRepository _productRepository;
-
 
     public GetProductQueryHandler(IProductRepository productRepository)
     {

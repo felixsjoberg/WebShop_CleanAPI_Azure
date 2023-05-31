@@ -22,14 +22,13 @@ namespace Presentation.API.Controllers
         private readonly ISender _mediator;
         private readonly IMapper _mapper;
 
-
         public ProductsController(IMapper mapper, ISender mediator)
         {
             _mapper = mapper;
             _mediator = mediator;
         }
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var query = new GetAllProductsQuery();
@@ -50,7 +49,7 @@ namespace Presentation.API.Controllers
             return Ok(response);
         }
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct(CreateProductRequest request)
         {
             var command = _mapper.Map<CreateProductCommand>(request);
