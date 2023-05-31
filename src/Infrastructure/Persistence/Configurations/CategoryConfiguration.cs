@@ -13,7 +13,7 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasKey(c => c.Id);
 
             builder.Property(c => c.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedOnAdd();
 
             builder.Property(c => c.Name)
                 .HasMaxLength(50)

@@ -30,7 +30,6 @@ public partial class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .WithOne(c => c.Customer)
             .HasForeignKey<Customer>(o => o.UserId);
 
-        // One customer has one address
         builder.HasOne(c => c.Address)
             .WithOne(a => a.Customer)
             .HasForeignKey<Customer>(c => c.AddressId)

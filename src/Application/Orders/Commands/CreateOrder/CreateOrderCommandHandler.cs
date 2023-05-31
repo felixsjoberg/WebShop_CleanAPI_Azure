@@ -6,33 +6,25 @@ using MediatR;
 
 namespace Application.Orders.Commands.CreateOrder;
 
-public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly IProductOrderRepository _productOrderRepository;
+    private readonly IAddressRepository _addressRepository;
 
-    public CreateOrderHandler(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository, IProductOrderRepository productOrderRepository)
+    public CreateOrderCommandHandler(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository, IProductOrderRepository productOrderRepository, IAddressRepository addressRepository)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _customerRepository = customerRepository;
         _productOrderRepository = productOrderRepository;
+        _addressRepository = addressRepository;
     }
 
     public async Task<CreateOrderResult> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        int customerId = 0;
-        var customer = new Customer(
-         command.Customer.FullName,
-         command.Customer.Streetaddress,
-         command.Customer.City,
-         command.Customer.Zipcode,
-         command.Customer.Country,
-         command.Customer.CountryCode,
-         command.UserId.ToString());
-
         var hasDuplicateProductIds = command.OrderItems
             .GroupBy(item => item.ProductId)
             .Any(group => group.Count() > 1);
@@ -41,34 +33,35 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrde
         {
             throw new DuplicateProductsInOrderItems();
         }
-
-        // Check if any customer already has the user that makes the order, if so update the customer, otherwise create a new customer.
-        var customers = await _customerRepository.GetAllAsync();
-        if (customers.Any(c => c.UserId == command.UserId.ToString()))
+        if (command.OrderItems.Count() == 0)
         {
-            var customer2 = customers.FirstOrDefault(c => c.UserId == command.UserId.ToString());
-            customer.Id = customer2.Id;
-            customerId = customer.Id;
-            await _customerRepository.UpdateAsync(customer);
-        }
-        else
-        {
-            customerId = await _customerRepository.AddAsync(customer);
+            throw new NoProductsInOrderItems();
         }
 
-        var order = new Order(customerId);
+        var address = new Address(
+            command.OrderDetails.Streetaddress,
+            command.OrderDetails.City,
+            command.OrderDetails.Zipcode,
+            command.OrderDetails.Country);
+
+        int AddressId = await _addressRepository.AddAsync(address);
+        var customer = await _customerRepository.FindByUserIdAsync(command.UserId.ToString()) ?? throw new InternalProblemWtihCreateOrder();
+        customer.UpdateCustomer(command.OrderDetails.FullName);
+
+        var order = new Order(customer.Id, customer, AddressId);
         await _orderRepository.CreateAsync(order);
-        order.Customer = customer;
+
         foreach (var products in command.OrderItems)
         {
             var product = await _productRepository.GetByIdAsync(products.ProductId);
-            if (product is null)
+            if (product is null || !product.IsActive)
             {
                 await _orderRepository.DeleteAsync(order);
                 throw new ProductNotFoundException();
             }
             if (product.Stock < products.Quantity)
             {
+                await _orderRepository.DeleteAsync(order);
                 throw new NotEnoughStockException();
             }
 
@@ -79,7 +72,6 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrde
             var productOrder = new ProductOrder(products.Quantity, productId, order.Id);
             await _productOrderRepository.CreateAsync(productOrder);
 
-            // Fetch the corresponding Product entity
             productOrder.Product = product;
         }
 

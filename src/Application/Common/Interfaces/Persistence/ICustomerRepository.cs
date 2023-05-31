@@ -8,4 +8,6 @@ public interface ICustomerRepository
     Task<IEnumerable<Customer>> GetAllAsync();
     Task<int> AddAsync(Customer customer);
     Task UpdateAsync(Customer customer);
+    // Task UpdateAsyncWithTracking(Customer customer);
+    Task<Customer?> FindByUserIdAsync(string userId);
 }

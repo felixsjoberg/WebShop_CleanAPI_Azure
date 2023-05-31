@@ -5,7 +5,7 @@ namespace Application.Orders.Commands.CreateOrder;
 public record CreateOrderCommand(
     Guid UserId,
     IEnumerable<OrderItem> OrderItems,
-    CustomerDto Customer
+    OrderDetails OrderDetails
 ) : IRequest<CreateOrderResult>;
 
 public record OrderItem(
@@ -13,11 +13,9 @@ public record OrderItem(
     int Quantity
 );
 
-public record CustomerDto(
+public record OrderDetails(
     string FullName,
     string Streetaddress,
     string City,
     string Zipcode,
-    string Country,
-    string CountryCode
-);
+    string Country);
