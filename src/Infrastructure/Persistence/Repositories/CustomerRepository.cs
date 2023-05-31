@@ -15,6 +15,11 @@ public class CustomerRepository : ICustomerRepository
     }
     public async Task<Customer?> GetByIdAsync(int id)
     {
+        var result = await _dbContext.Customers.FindAsync(id);
+        return result;
+    }
+    public async Task<Customer?> GetByIdNoTrackAsync(int id)
+    {
         var result = await _dbContext.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         return result;
     }
@@ -37,5 +42,13 @@ public class CustomerRepository : ICustomerRepository
         _dbContext.Entry(customer).State = EntityState.Modified;
         _dbContext.Customers.Update(customer);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<Customer?> FindByUserIdAsync(string userId)
+    {
+        var customer = await _dbContext.Customers
+            .Include(c => c.Address)
+            .SingleOrDefaultAsync(c => c.UserId == userId);
+        return customer;
     }
 }

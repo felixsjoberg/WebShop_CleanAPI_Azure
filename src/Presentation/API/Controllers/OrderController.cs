@@ -1,12 +1,13 @@
 using Application.Orders.Commands.CreateOrder;
 using Application.Orders.Commands.DeleteOrder;
+using Application.Orders.Commands.UpdateOrder;
 using Application.Orders.Common.DTOs;
 using Application.Orders.Queries.GetAllOrders;
-using BankApplication.Api.Service;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.API.Service;
 using Presentation.Contracts;
 using Presentation.Contracts.Orders.CreateOrder;
 using Presentation.Contracts.Orders.UpdateOrder;
@@ -55,14 +56,16 @@ namespace API.Controllers
         }
         [HttpPut]
         [Authorize(Roles = "Admin")]
-        //Change to Admin
         public async Task<IActionResult> UpdateAsync(UpdateOrderRequest request)
         {
-            throw new NotImplementedException();
+            var command = _mapper.Map<UpdateOrderCommand>(request);
+
+            await _mediator.Send(command);
+
+            return NoContent();
         }
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        //Change to Admin
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var command = new DeleteOrderCommand(id);

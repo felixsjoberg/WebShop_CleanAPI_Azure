@@ -11,6 +11,14 @@ public class CategoryRepository : ICategoryRepository
     {
         _dbContext = dbContext;
     }
+    public async Task<Category?> GetByIdAsync(int id)
+    {
+        var result = await _dbContext.Categories
+        .AsNoTracking()
+        .FirstOrDefaultAsync(x => x.Id == id);
+
+        return result;
+    }
     public async Task<int> AddAsync(Category category)
     {
         await _dbContext.Categories.AddAsync(category);
@@ -28,5 +36,10 @@ public class CategoryRepository : ICategoryRepository
         .ToListAsync();
 
         return result;
+    }
+    public async Task DeleteAsync(Category category)
+    {
+        _dbContext.Categories.Remove(category);
+        await _dbContext.SaveChangesAsync();
     }
 }

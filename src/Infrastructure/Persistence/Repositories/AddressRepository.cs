@@ -44,11 +44,6 @@ namespace Infrastructure.Persistence.Repositories
         }
         public async Task UpdateAsync(Address address)
         {
-            // var existingAddress = await _dbContext.Addresses.FindAsync(address.Id);
-            // if (existingAddress != null)
-            // {
-            //     _dbContext.Entry(existingAddress).State = EntityState.Detached;
-            // }
             _dbContext.Entry(address).State = EntityState.Modified;
             _dbContext.Addresses.Update(address);
             await _dbContext.SaveChangesAsync();

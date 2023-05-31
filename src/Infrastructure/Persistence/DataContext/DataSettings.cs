@@ -6,4 +6,3 @@ public class DataSettings
 
     public string SqlServer { get; set; } = null!;
 }
-

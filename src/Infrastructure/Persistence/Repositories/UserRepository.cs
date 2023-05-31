@@ -64,9 +64,9 @@ public class UserRepository : IUserRepository
             throw new PasswordValidationException();
         }
 
-        if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
+        if (await _roleManager.RoleExistsAsync(UserRoles.User))
         {
-            await _userManager.AddToRoleAsync(user, UserRoles.Admin);
+            await _userManager.AddToRoleAsync(user, UserRoles.User);
         }
 
         return user.Id;

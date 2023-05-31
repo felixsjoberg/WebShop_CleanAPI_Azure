@@ -3,7 +3,7 @@ using MapsterMapper;
 using Mapster;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using BankApplication.Api.Service;
+using Presentation.API.Service;
 
 namespace Presentation.API;
 

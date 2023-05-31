@@ -16,13 +16,29 @@ public class OrderRepository : IOrderRepository
     public async Task<Order?> GetByIdAsync(Guid id)
     {
         var orderId = new OrderId(id);
-        var result = await _dbContext.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(orderId));
+        var result = await _dbContext.Orders
+        .Include(o => o.Customer)
+        .Include(o => o.ProductOrders)
+        .ThenInclude(po => po.Product)
+        .FirstOrDefaultAsync(o => o.Id.Equals(orderId));
+        return result;
+    }
+    public async Task<Order?> GetByIdNoTrackAsync(Guid id)
+    {
+        var orderId = new OrderId(id);
+        var result = await _dbContext.Orders
+        .AsNoTracking()
+        .Include(o => o.Customer)
+        .Include(o => o.ProductOrders)
+        .ThenInclude(po => po.Product)
+        .FirstOrDefaultAsync(o => o.Id.Equals(orderId));
         return result;
     }
     public async Task<IEnumerable<Order>> GetAllAsync()
     {
         return await _dbContext.Orders
         .AsNoTracking()
+        .Include(o => o.ShippingAddress)
         .Include(o => o.Customer)
         .Include(o => o.ProductOrders)
         .ThenInclude(po => po.Product)
@@ -37,12 +53,11 @@ public class OrderRepository : IOrderRepository
     public async Task UpdateAsync(Order order)
     {
         _dbContext.Orders.Entry(order).CurrentValues.SetValues(order);
-
+        _dbContext.Orders.Update(order);
         await _dbContext.SaveChangesAsync();
     }
     public async Task DeleteAsync(Order order)
     {
-        // var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.Id.Value == id);
         _dbContext.Orders.Remove(order);
         await _dbContext.SaveChangesAsync();
     }
