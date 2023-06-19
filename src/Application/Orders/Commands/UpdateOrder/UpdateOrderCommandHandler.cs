@@ -32,6 +32,23 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Uni
         {
             throw new OrderAlreadyShipped();
         }
+        if (!command.OrderItems.Any())
+        {
+            throw new NoProductsInOrderItems();
+        }
+
+        // Find all products that has been removed from the order
+        var productIdsToRemove = order.ProductOrders
+        .Where(productOrder => !command.OrderItems.Any(item => item.ProductId == productOrder.ProductId.Value))
+        .Select(productOrder => productOrder.ProductId.Value)
+        .ToList();
+
+        foreach (var productIdToRemove in productIdsToRemove)
+        {
+            var product = await _productRepository.GetByIdAsync(productIdToRemove) ?? throw new ProductNotFoundException();
+            product.IncreaseStock(order.ProductOrders.FirstOrDefault(productOrder => productOrder.ProductId.Value == productIdToRemove)!.Quantity);
+            await _productRepository.UpdateAsyncWithTrack(product);
+        }
 
         List<ProductOrder> productOrders = new();
         order.Status = command.Status switch
@@ -58,14 +75,13 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Uni
             var productOrder = new ProductOrder(products.Quantity, productid, order.Id);
 
             var oldProductQuantity = order.ProductOrders.FirstOrDefault(x => x.ProductId.Equals(productid))?.Quantity;
-
             if (oldProductQuantity == null)
             {
                 product.DecreaseStock(products.Quantity);
                 await _productRepository.UpdateAsync(product);
             }
 
-            if (product.Stock < (products.Quantity - oldProductQuantity))
+            if (product.Stock < (products.Quantity - oldProductQuantity ?? 0))
             {
                 throw new NotEnoughStockException();
             }
@@ -76,17 +92,16 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Uni
 
             if (products.Quantity > oldProductQuantity)
             {
-                var difference = products.Quantity - oldProductQuantity;
+                var difference = products.Quantity - (oldProductQuantity ?? 0);
                 product.DecreaseStock((int)difference);
                 await _productRepository.UpdateAsyncWithTrack(product);
             }
             else if (products.Quantity < oldProductQuantity)
             {
-                var difference = oldProductQuantity - products.Quantity;
+                var difference = (oldProductQuantity ?? 0) - products.Quantity;
                 product.IncreaseStock((int)difference);
                 await _productRepository.UpdateAsyncWithTrack(product);
             }
-
 
             if (order.ProductOrders.Any(x => x.ProductId.Value.Equals(products.ProductId)))
             {

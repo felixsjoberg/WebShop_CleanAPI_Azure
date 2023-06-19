@@ -3,6 +3,7 @@ using Application.Orders.Commands.DeleteOrder;
 using Application.Orders.Commands.UpdateOrder;
 using Application.Orders.Common.DTOs;
 using Application.Orders.Queries.GetAllOrders;
+using Application.Orders.Queries.GetUserOrders;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,20 @@ namespace API.Controllers
             var query = new GetAllOrdersQuery();
             var result = await _mediator.Send(query);
             var response = _mapper.Map<OrderDtoList>(result);
+            return Ok(response);
+        }
+        [HttpGet]
+        [Authorize(Roles = "User")]
+        [Route("GetUserOrders")]
+        public async Task<IActionResult> GetUserOrders()
+        {
+            Guid userId = _jwtService.ExtractJwt();
+            var query = new GetUserOrdersQuery(userId);
+
+            var result = await _mediator.Send(query);
+
+            var response = _mapper.Map<OrderDtoList>(result);
+
             return Ok(response);
         }
         [HttpPost]

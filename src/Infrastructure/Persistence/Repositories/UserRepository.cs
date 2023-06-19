@@ -66,7 +66,7 @@ public class UserRepository : IUserRepository
 
         if (await _roleManager.RoleExistsAsync(UserRoles.User))
         {
-            await _userManager.AddToRoleAsync(user, UserRoles.User);
+            await _userManager.AddToRoleAsync(user, UserRoles.Admin);
         }
 
         return user.Id;

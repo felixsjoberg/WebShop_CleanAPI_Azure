@@ -1,9 +1,6 @@
 using Infrastructure;
 using Application;
 using Presentation.API;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +10,10 @@ builder.Services
     .AddApplication();
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseExceptionHandler("/error");
 
 app.UseHttpsRedirection();

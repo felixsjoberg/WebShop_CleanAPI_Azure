@@ -34,6 +34,18 @@ public class OrderRepository : IOrderRepository
         .FirstOrDefaultAsync(o => o.Id.Equals(orderId));
         return result;
     }
+    public async Task<IEnumerable<Order>> GetUserOrdersAsync(Guid userId)
+    {
+        return await _dbContext.Orders
+        .AsNoTracking()
+        .Include(o => o.ShippingAddress)
+        .Include(o => o.Customer)
+        .Include(o => o.ProductOrders)
+        .ThenInclude(po => po.Product)
+        .OrderByDescending(o => o.OrderDate)
+        .Where(x=>x.Customer.UserId == userId.ToString())
+        .ToListAsync();
+    }
     public async Task<IEnumerable<Order>> GetAllAsync()
     {
         return await _dbContext.Orders

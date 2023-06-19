@@ -77,54 +77,53 @@ public static class DependencyInjection
         configuration.Bind(DataSettings.SectionName, settings);
         services.AddSingleton(Options.Create(settings));
 
+        var keyVaultURL = configuration.GetSection("KeyVault:KeyVaultURL");
+        var keyVaultClientId = configuration.GetSection("KeyVault:ClientId");
+        var keyVaultClientSecret = configuration.GetSection("KeyVault:ClientSecret");
+        var keyVaultDirectoryId = configuration.GetSection("KeyVault:DirectoryId");
+
+        var credential = new ClientSecretCredential(keyVaultDirectoryId.Value!, keyVaultClientId.Value!, keyVaultClientSecret.Value!);
+
+        configuration.AddAzureKeyVault(keyVaultURL.Value!, keyVaultClientId.Value!, keyVaultClientSecret.Value!, new DefaultKeyVaultSecretManager());
+
+        var client = new SecretClient(new Uri(keyVaultURL.Value!), credential);
+        services.AddDbContext<TopStyleDbContext>(options => options.UseSqlServer(client.GetSecret("ProdConnection").Value.Value.ToString(),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
+        var jwtSecretKey = client.GetSecret("JwtSecretKey").Value.Value.ToString();
+
         var JwtSettings = new JwtSettings();
         configuration.Bind(JwtSettings.SectionName, JwtSettings);
+        services.AddSingleton(Options.Create(JwtSettings));
+        JwtSettings.SecretKey = jwtSecretKey;
 
-        if (environment.IsDevelopment())
-        {
-            var keyVaultURL = configuration.GetSection("KeyVault:KeyVaultURL");
-            var keyVaultClientId = configuration.GetSection("KeyVault:ClientId");
-            var keyVaultClientSecret = configuration.GetSection("KeyVault:ClientSecret");
-            var keyVaultDirectoryId = configuration.GetSection("KeyVault:DirectoryId");
+        services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = JwtSettings.Issuer,
+                ValidAudience = JwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtSecretKey))
+            });
 
-            var credential = new ClientSecretCredential(keyVaultDirectoryId.Value!, keyVaultClientId.Value!, keyVaultClientSecret.Value!);
-
-            configuration.AddAzureKeyVault(keyVaultURL.Value!, keyVaultClientId.Value!, keyVaultClientSecret.Value!, new DefaultKeyVaultSecretManager());
-
-            var client = new SecretClient(new Uri(keyVaultURL.Value!), credential);
-            services.AddDbContext<TopStyleDbContext>(options => options.UseSqlServer(client.GetSecret("ProdConnection").Value.Value.ToString(),
-            sqlOptions => sqlOptions.EnableRetryOnFailure()));
-
-            var jwtSecretKey = client.GetSecret("JwtSecretKey").Value.Value.ToString();
-
-            services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = JwtSettings.Issuer,
-                    ValidAudience = JwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSecretKey))
-                });
-        }
-        else
-        {
-            services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = JwtSettings.Issuer,
-                    ValidAudience = JwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(JwtSettings.SecretKey))
-                });
-        }
+        // else
+        // {
+        //     services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+        //         .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
+        //         {
+        //             ValidateIssuer = true,
+        //             ValidateAudience = true,
+        //             ValidateLifetime = true,
+        //             ValidateIssuerSigningKey = true,
+        //             ValidIssuer = JwtSettings.Issuer,
+        //             ValidAudience = JwtSettings.Audience,
+        //             IssuerSigningKey = new SymmetricSecurityKey(
+        //                 Encoding.UTF8.GetBytes(JwtSettings.SecretKey))
+        //         });
+        // }
         return services;
     }
 }
