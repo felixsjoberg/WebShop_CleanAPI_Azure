@@ -108,22 +108,6 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(jwtSecretKey))
             });
-
-        // else
-        // {
-        //     services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-        //         .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
-        //         {
-        //             ValidateIssuer = true,
-        //             ValidateAudience = true,
-        //             ValidateLifetime = true,
-        //             ValidateIssuerSigningKey = true,
-        //             ValidIssuer = JwtSettings.Issuer,
-        //             ValidAudience = JwtSettings.Audience,
-        //             IssuerSigningKey = new SymmetricSecurityKey(
-        //                 Encoding.UTF8.GetBytes(JwtSettings.SecretKey))
-        //         });
-        // }
         return services;
     }
 }

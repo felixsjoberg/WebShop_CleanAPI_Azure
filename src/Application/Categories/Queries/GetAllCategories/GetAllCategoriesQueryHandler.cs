@@ -1,4 +1,3 @@
-using Application.Categories.Common.DTOs;
 using Application.Common.Interfaces.Persistence;
 using MediatR;
 
